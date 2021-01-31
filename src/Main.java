@@ -7,72 +7,55 @@
 //     相关说明:
 //*************************************************************************
 
-import java.util.Random;
+import algorithm.ISort;
+import algorithm.InsertSort;
+import algorithm.SelectSort;
+import utils.CheckUtils;
+import utils.GenerateUtils;
 
 public class Main {
-
-    public static int[] generateRandomArr(int num, int max) {
-        int[] result = new int[num];
-        Random random = new Random();
-        for (int i = 0; i < result.length; i++) {
-            result[i] = random.nextInt(max);
-        }
-        return result;
+    //-------------------------------------------------------------------------
+    private static void __log(String message) {
+        System.out.println(message);
     }
 
-    public static boolean isSort(int[] arr) {
-        for (int i = 1; i < arr.length; i++) {
-            if (arr[i - 1] > arr[i]) {
-                return false;
-            }
+    //-------------------------------------------------------------------------
+    private static <T> String __arrayToString(T[] array) {
+        StringBuffer builder = new StringBuffer();
+        for (T item : array) {
+            builder.append(item.toString() + ",");
         }
-        return true;
+        return builder.toString();
     }
 
-    public static void selectSort(int[] arr) {
-        for (int i = 0; i < arr.length; i++) {
-            int minIdx = i;
-            for (int j = i + 1; j < arr.length; j++) {
-                if (arr[j] < arr[minIdx]) {
-                    minIdx = j;
-                }
-            }
-            if (arr[minIdx] < arr[i]) {
-                int temp = arr[i];
-                arr[i] = arr[minIdx];
-                arr[minIdx] = temp;
-            }
-        }
+    //-------------------------------------------------------------------------
+    public static <T extends Comparable> void algorithmATest(ISort iSort, T[] array) {
+        __log("------------------------------------");
+        double now = System.nanoTime();
+//        __log(String.format("%s sort B: %s", iSort.getClass().getName(), __arrayToString(array)));
+        iSort.sort(array);
+//        __log(String.format("%s sort A: %s", iSort.getClass().getName(), __arrayToString(array)));
+        double runTime = (System.nanoTime() - now) / 1000000000.0f;
+        System.out.println(String.format("%s run %d  use time %f s", iSort.getClass().getName(), array.length, runTime));
     }
 
-    public static void insertSort(int[] arr) {
-        for (int i = 1; i < arr.length; i++) {
-            for (int j = i; j > 0; j--) {
-                if (arr[j] < arr[j - 1]) {
-                    int temp = arr[j];
-                    arr[j] = arr[j - 1];
-                    arr[j - 1] = temp;
-                } else {
-                    break;
-                }
-            }
-        }
-    }
+    //-------------------------------------------------------------------------
+    public static void algorithmALLRandomTest() {
+        Integer[] numArr = {10000, 100000};
+//      Integer[] numArr = {10};
 
-    public static void main(String[] args) {
-        int[] numArr = {10000, 100000};
         for (int num : numArr) {
-            double now = System.nanoTime();
-            int[] randomArr = generateRandomArr(num, num);
-            selectSort(randomArr);
-//           insertSort(randomArr);
-            double runTime = (System.nanoTime() - now) / 1000000000.0f;
+            Integer[] randomArr = GenerateUtils.generateRandomNumToArr(num, num);
+            Integer[] cloneArr = GenerateUtils.cloneArr(randomArr);
 
-            System.out.println(String.format("run %d  use time %f s", num, runTime));
-
-            if (!isSort(randomArr)) {
-                throw new RuntimeException("算法有问题");
-            }
+            algorithmATest(new SelectSort(), randomArr);
+            algorithmATest(new InsertSort(), cloneArr);
         }
     }
+
+    //-------------------------------------------------------------------------
+    public static void main(String[] args) {
+        algorithmALLRandomTest();
+    }
+    //-------------------------------------------------------------------------
 }
